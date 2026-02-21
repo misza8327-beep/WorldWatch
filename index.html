@@ -11,93 +11,78 @@
         /* Экран приветствия */
         #intro {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            background: black; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 9999;
+            background: black; display: flex; align-items: center; justify-content: center; 
+            z-index: 9999; transition: opacity 1s ease;
         }
-        .welcome-text { font-size: 3rem; margin-bottom: 20px; color: var(--main-color); text-shadow: 0 0 15px var(--main-color); }
-        .skip-btn { 
-            padding: 15px 45px; border: 2px solid var(--main-color); 
-            background: var(--main-color); color: black; cursor: pointer; 
-            border-radius: 50px; font-weight: bold; font-size: 1.2rem; 
-            transition: 0.3s; box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
-        }
-        .skip-btn:hover { background: transparent; color: white; scale: 1.1; }
+        .welcome-text { font-size: 3.5rem; color: var(--main-color); text-shadow: 0 0 20px var(--main-color); animation: pulse 2s infinite; }
 
-        /* Главное меню (скрыто в начале) */
-        #main-content { display: none; min-height: 100vh; padding: 40px 20px; text-align: center; }
+        /* Главное меню */
+        #main-content { display: none; opacity: 0; min-height: 100vh; padding: 40px 20px; text-align: center; transition: opacity 1s ease; }
         .header { font-size: 3.5rem; color: var(--main-color); margin-top: 50px; text-transform: uppercase; letter-spacing: 8px; }
         
         /* Сетка продуктов */
         .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 40px auto; }
-        .product-card { background: #151515; padding: 30px; border-radius: 20px; border: 1px solid #333; transition: 0.3s; }
-        .product-card:hover { border-color: var(--main-color); transform: translateY(-10px); }
+        .product-card { background: #151515; padding: 30px; border-radius: 20px; border: 1px solid #333; }
         .price { font-size: 1.8rem; color: var(--main-color); margin: 15px 0; font-weight: bold; }
 
-        /* Языки */
-        .lang-switcher { position: sticky; top: 10px; z-index: 100; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 10px; display: inline-block; }
-        .lang-btn { background: #222; color: white; border: 1px solid #444; padding: 8px 15px; cursor: pointer; border-radius: 5px; margin: 0 5px; }
-        .lang-btn:hover { border-color: var(--main-color); }
-
-        /* WhatsApp */
+        /* WhatsApp кнопка */
         .whatsapp-btn { 
             display: inline-block; background: #25d366; color: white; 
             padding: 18px 35px; border-radius: 50px; text-decoration: none; 
             font-weight: bold; margin-top: 40px; font-size: 1.1rem;
-            transition: 0.3s;
         }
-        .whatsapp-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
     </style>
 </head>
 <body>
 
     <div id="intro">
-        <div class="welcome-text" id="hello-text">Добрый день</div>
-        <button class="skip-btn" onclick="goToMenu()" id="skip-txt">Пропустить</button>
+        <div class="welcome-text">Добрый день</div>
     </div>
 
     <div id="main-content">
-        <div class="lang-switcher">
-            <button class="lang-btn" onclick="changeLang('ru')">RU</button>
-            <button class="lang-btn" onclick="changeLang('it')">IT</button>
-            <button class="lang-btn" onclick="changeLang('en')">EN</button>
-            <button class="lang-btn" onclick="changeLang('pl')">PL</button>
-        </div>
-
         <h1 class="header">WorldWatch</h1>
-        <h2 id="prod-title" style="color: #888;">Продукты</h2>
+        <h2 style="color: #888;">Наши Продукты</h2>
 
         <div class="products-grid" id="products-list">
             </div>
 
         <a href="https://wa.me/48796128572" class="whatsapp-btn">Связаться в WhatsApp</a>
-        <p style="margin-top: 50px; color: #444;">WhatsApp: +48 796 128 572</p>
+        <p style="margin-top: 30px; color: #444;">+48 796 128 572</p>
     </div>
 
     <script>
-        // ТВОИ ТОВАРЫ (Меняй названия и цены здесь!)const myProducts = [
+        // ТВОИ ТОВАРЫ (Редактируй тут)
+        const myProducts = [
             { name: "Premium Gold Watch", price: "899 PLN", icon: "👑" },
             { name: "Sport Edition Blue", price: "350 PLN", icon: "⌚" },
-            { name: "Smart Series 5", price: "550 PLN", icon: "📱" },
-            { name: "Classic Leather", price: "299 PLN", icon: "💼" }
+            { name: "Smart Series 5", price: "550 PLN", icon: "📱" }
         ];
 
-        // Тексты для языков
-        const translations = {
-            ru: { hello: "Добрый день", skip: "Пропустить", title: "Наши Продукты", btn: "Связаться в WhatsApp" },
-            it: { hello: "Buon giorno", skip: "Saltare", title: "I nostri prodotti", btn: "Contatto WhatsApp" },
-            en: { hello: "Good day", skip: "Skip", title: "Our Products", btn: "Contact WhatsApp" },
-            pl: { hello: "Dzień dobry", skip: "Pominąć", title: "Nasze Produkty", btn: "Kontakt WhatsApp" }
+        // ФУНКЦИЯ АВТО-ПЕРЕХОДА
+        window.onload = function() {
+            // Ждем 2 секунды (2000 миллисекунд)
+            setTimeout(() => {
+                const intro = document.getElementById('intro');
+                const main = document.getElementById('main-content');
+                
+                intro.style.opacity = '0'; // Плавно исчезает приветствие
+                
+                setTimeout(() => {
+                    intro.style.display = 'none';
+                    main.style.display = 'block';
+                    setTimeout(() => { main.style.opacity = '1'; }, 50);
+                    document.body.style.overflow = 'auto'; // Включаем прокрутку
+                    renderProducts();
+                }, 1000); // Время на исчезновение
+            }, 2000); 
         };
 
-        // ГЛАВНАЯ ФУНКЦИЯ: ПЕРЕХОД В МЕНЮ
-        function goToMenu() {
-            document.getElementById('intro').style.display = 'none'; // Скрываем интро
-            document.getElementById('main-content').style.display = 'block'; // Показываем меню
-            document.body.style.overflow = 'auto'; // Включаем прокрутку
-            renderProducts(); // Рисуем товары
-        }
-
-        // Функция отрисовки товаров
         function renderProducts() {
             const list = document.getElementById('products-list');
             list.innerHTML = myProducts.map(p => 
@@ -107,14 +92,6 @@
                     <div class="price">${p.price}</div>
                 </div>
             ).join('');
-        }
-
-        // Функция смены языка
-        function changeLang(lang) {
-            document.getElementById('hello-text').innerText = translations[lang].hello;
-            document.getElementById('skip-txt').innerText = translations[lang].skip;
-            document.getElementById('prod-title').innerText = translations[lang].title;
-            document.querySelector('.whatsapp-btn').innerText = translations[lang].btn;
         }
     </script>
 </body>
