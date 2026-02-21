@@ -6,104 +6,92 @@
     <title>WorldWatch Admin Mode</title>
     <style>
         :root { --main-color: #00ffcc; --bg-color: #0a0a0a; }
-        body { background: var(--bg-color); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-        #main-content { padding: 40px 20px; text-align: center; min-height: 100vh; }
+        body { background: var(--bg-color); color: white; font-family: sans-serif; margin: 0; padding: 0; }
+        #main { padding: 40px 20px; text-align: center; min-height: 100vh; }
         .header { font-size: 3.5rem; color: var(--main-color); text-transform: uppercase; letter-spacing: 8px; margin-bottom: 30px; }
-        
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
-        .product-card { background: #151515; padding: 30px; border-radius: 20px; border: 1px solid #333; position: relative; text-align: left; transition: 0.3s; }
-        .product-card:hover { border-color: var(--main-color); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .card { background: #151515; padding: 30px; border-radius: 20px; border: 1px solid #333; position: relative; text-align: left; }
         .price { font-size: 1.8rem; color: white; font-weight: bold; border-top: 1px solid #333; padding-top: 15px; display: block; }
-
+        
         /* Панель администратора */
         #admin-panel { 
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: #1a1a1a; padding: 30px; border: 2px solid var(--main-color); z-index: 10001;
             border-radius: 20px; width: 350px; box-shadow: 0 0 100px #000;
         }
-        #admin-panel input, #admin-panel textarea { 
-            width: 100%; margin-bottom: 15px; background: #222; border: 1px solid #444; color: white; padding: 12px; box-sizing: border-box; border-radius: 8px;
-        }
+        input, textarea { width: 100%; margin-bottom: 15px; background: #222; border: 1px solid #444; color: white; padding: 12px; box-sizing: border-box; border-radius: 8px; }
         .admin-btn { background: var(--main-color); color: black; border: none; padding: 12px; cursor: pointer; font-weight: bold; width: 100%; border-radius: 8px; }
-        .delete-btn { position: absolute; top: 15px; right: 15px; background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; display: none; }
-
-        .whatsapp-btn { display: inline-block; background: #25d366; color: white; padding: 18px 35px; border-radius: 50px; text-decoration: none; font-weight: bold; margin-top: 40px; }
+        .del-btn { position: absolute; top: 15px; right: 15px; background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; display: none; }
+        .wa-btn { display: inline-block; background: #25d366; color: white; padding: 18px 35px; border-radius: 50px; text-decoration: none; font-weight: bold; margin-top: 40px; }
     </style>
 </head>
 <body>
 
-    <div id="main-content">
+    <div id="main">
         <h1 class="header">WorldWatch</h1>
-        <div class="products-grid" id="products-list"></div>
-        <a href="https://wa.me/48796128572" class="whatsapp-btn">Связаться в WhatsApp</a>
+        <div class="grid" id="list"></div>
+        <a href="https://wa.me/48796128572" class="wa-btn">Связаться в WhatsApp</a>
     </div>
 
     <div id="admin-panel">
-        <h3 style="color:var(--main-color)">Редактирование товаров</h3>
-        <input type="text" id="p-name" placeholder="Название товара">
-        <input type="text" id="p-price" placeholder="Цена (например: 100 PLN)">
+        <h3 style="color:var(--main-color)">Режим редактирования</h3>
+        <input type="text" id="p-name" placeholder="Название">
+        <input type="text" id="p-price" placeholder="Цена (н-р: 500 PLN)">
         <textarea id="p-desc" placeholder="Описание"></textarea>
-        <input type="text" id="p-icon" placeholder="Эмодзи (⌚, 👑, 🎁)">
-        <button class="admin-btn" onclick="addNewProduct()">Добавить товар</button>
-        <button class="admin-btn" style="background:#444; color:white; margin-top:10px;" onclick="closeAdmin()">Выйти из режима</button>
+        <input type="text" id="p-icon" placeholder="Иконка (⌚, 👑)">
+        <button class="admin-btn" onclick="addP()">Добавить товар</button>
+        <button class="admin-btn" style="background:#444; color:white; margin-top:10px;" onclick="closeAdmin()">Выйти</button>
     </div>
 
     <script>
-        const ADMIN_PASS = "1396";
-        
-        let products = JSON.parse(localStorage.getItem('my_items')) || [
-            { name: "Classic Gold", price: "899 PLN", desc: "Премиальные часы.", icon: "👑" }
+        const PASS = "1396";
+        let products = JSON.parse(localStorage.getItem('ww_items')) || [
+            { name: "Classic Gold", price: "899 PLN", desc: "Премиальные часы.", icon: "⌚" }
         ];
 
         function render() {
-            const list = document.getElementById('products-list');
+            const list = document.getElementById('list');
             list.innerHTML = products.map((p, i) => 
-                <div class="product-card">
-                    <button class="delete-btn" id="del-${i}" onclick="removeProduct(${i})">❌ Удалить</button>
-                    <div style="font-size: 50px; margin-bottom: 10px;">${p.icon}</div>
+                <div class="card">
+                    <button class="del-btn" onclick="removeP(${i})">❌ Удалить</button>
+                    <div style="font-size: 50px;">${p.icon}</div>
                     <h3>${p.name}</h3>
                     <p style="color:#888;">${p.desc}</p>
                     <span class="price">${p.price}</span>
                 </div>
             ).join('');
-        }// ОТСЛЕЖИВАНИЕ ALT + A
+        }
+
+        // ВХОД ЧЕРЕЗ F2
         document.addEventListener('keydown', function(e) {
-            // e.code 'KeyA' работает для любой раскладки (и русской, и английской)
-            if (e.altKey && (e.code === 'KeyA'  e.key === 'a'  e.key === 'ф')) {
+            if (e.key === "F2") {
                 e.preventDefault();
-                let p = prompt("Введите пароль (1396):");
-                if (p === ADMIN_PASS) {
+                let p = prompt("Пароль:");
+                if (p === PASS) {
                     document.getElementById('admin-panel').style.display = 'block';
-                    document.querySelectorAll('.delete-btn').forEach(b => b.style.display = 'block');
-                } else {
-                    alert("Доступ запрещен!");
+                    document.querySelectorAll('.del-btn').forEach(b => b.style.display = 'block');
                 }
             }
-        });
-
-        function addNewProduct() {
-            const name = document.getElementById('p-name').value;
-            const price = document.getElementById('p-price').value;
-            const desc = document.getElementById('p-desc').value;
-            const icon = document.getElementById('p-icon').value || "⌚";
-
-            if (name && price) {
-                products.push({ name, price, desc, icon });
+        });function addP() {
+            const n = document.getElementById('p-name').value;
+            const pr = document.getElementById('p-price').value;
+            const d = document.getElementById('p-desc').value;
+            const i = document.getElementById('p-icon').value || "⌚";
+            if(n && pr) {
+                products.push({ name: n, price: pr, desc: d, icon: i });
                 save();
             }
         }
 
-        function removeProduct(i) {
+        function removeP(i) {
             products.splice(i, 1);
             save();
-            // После удаления оставляем кнопки видимыми
-            document.querySelectorAll('.delete-btn').forEach(b => b.style.display = 'block');
+            document.querySelectorAll('.del-btn').forEach(b => b.style.display = 'block');
         }
 
         function save() {
-            localStorage.setItem('my_items', JSON.stringify(products));
+            localStorage.setItem('ww_items', JSON.stringify(products));
             render();
-            // Очистка полей
             document.getElementById('p-name').value = '';
             document.getElementById('p-price').value = '';
             document.getElementById('p-desc').value = '';
@@ -111,7 +99,7 @@
 
         function closeAdmin() {
             document.getElementById('admin-panel').style.display = 'none';
-            document.querySelectorAll('.delete-btn').forEach(b => b.style.display = 'none');
+            document.querySelectorAll('.del-btn').forEach(b => b.style.display = 'none');
         }
 
         window.onload = render;
