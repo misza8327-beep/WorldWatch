@@ -12,21 +12,21 @@
         #intro {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
             background: black; display: flex; align-items: center; justify-content: center; 
-            z-index: 9999; transition: opacity 0.8s ease;
+            z-index: 9999;
         }
         .welcome-text { font-size: 3.5rem; color: var(--main-color); text-shadow: 0 0 20px var(--main-color); }
 
         /* Главное меню */
-        #main-content { display: none; opacity: 0; min-height: 100vh; padding: 40px 20px; text-align: center; transition: opacity 0.8s ease; }
+        #main-content { display: none; min-height: 100vh; padding: 40px 20px; text-align: center; }
         .header { font-size: 3.5rem; color: var(--main-color); margin-top: 50px; text-transform: uppercase; letter-spacing: 8px; }
         
-        /* Сетка продуктов */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 40px auto; }
-        .product-card { background: #151515; padding: 30px; border-radius: 20px; border: 1px solid #333; transition: 0.3s; }
-        .product-card:hover { border-color: var(--main-color); transform: translateY(-5px); }
-        .price { font-size: 1.8rem; color: var(--main-color); margin: 15px 0; font-weight: bold; }
+        /* Продукты */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 40px auto; }
+        .product-card { background: #151515; padding: 30px; border-radius: 20px; border: 1px solid #333; text-align: left; }
+        .product-card h3 { color: var(--main-color); margin: 10px 0; }
+        .price { font-size: 1.6rem; color: white; margin: 15px 0; font-weight: bold; border-top: 1px solid #333; padding-top: 10px; }
 
-        /* WhatsApp кнопка */
+        /* WhatsApp */
         .whatsapp-btn { 
             display: inline-block; background: #25d366; color: white; 
             padding: 18px 35px; border-radius: 50px; text-decoration: none; 
@@ -42,50 +42,36 @@
 
     <div id="main-content">
         <h1 class="header">WorldWatch</h1>
-        <h2 style="color: #888;">Наши Продукты</h2>
-
-        <div class="products-grid" id="products-list">
-            </div>
-
-        <a href="https://wa.me/48796128572" class="whatsapp-btn">Связаться в WhatsApp</a>
-        <p style="margin-top: 30px; color: #444;">WhatsApp: +48 796 128 572</p>
+        <h2 style="color: #444;">Каталог Продуктов</h2>
+        <div class="products-grid" id="products-list"></div>
+        <a href="https://wa.me/48796128572" class="whatsapp-btn">Заказать через WhatsApp</a>
     </div>
 
     <script>
-        // ТВОИ ТОВАРЫ
         const myProducts = [
-            { name: "Premium Gold Watch", price: "899 PLN", icon: "👑" },
-            { name: "Sport Edition Blue", price: "350 PLN", icon: "⌚" },
-            { name: "Smart Series 5", price: "550 PLN", icon: "📱" },
-            { name: "Classic Leather", price: "299 PLN", icon: "💼" }
+            { name: "Golden Luxury", price: "899 PLN", desc: "Эксклюзивные часы.", icon: "👑" },
+            { name: "Sport Aqua", price: "350 PLN", desc: "Для активного отдыха.", icon: "⌚" },
+            { name: "Smart Future", price: "550 PLN", desc: "Умные технологии.", icon: "📱" }
         ];
 
-        // АВТОМАТИЧЕСКИЙ ПЕРЕХОД ЧЕРЕЗ 2 СЕКУНДЫ
+        // ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ
         window.onload = function() {
             setTimeout(() => {
-                const intro = document.getElementById('intro');
-                const main = document.getElementById('main-content');
-                
-                intro.style.opacity = '0'; // Исчезает
-                
-                setTimeout(() => {
-                    intro.style.display = 'none';
-                    main.style.display = 'block';
-                    setTimeout(() => { 
-                        main.style.opacity = '1'; 
-                        document.body.style.overflow = 'auto'; // Включаем прокрутку
-                    }, 50);
-                    renderProducts();
-                }, 800); 
-            }, 2000); // 2000 = 2 секунды
+                // Убираем интро и показываем сайт СРАЗУ
+                document.getElementById('intro').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                document.body.style.overflow = 'auto'; 
+                renderProducts();
+            }, 2000); // Ровно 2 секунды
         };
 
         function renderProducts() {
             const list = document.getElementById('products-list');
             list.innerHTML = myProducts.map(p => 
                 <div class="product-card">
-                    <div style="font-size: 60px; margin-bottom: 10px;">${p.icon}</div>
+                    <div style="font-size: 50px;">${p.icon}</div>
                     <h3>${p.name}</h3>
+                    <p style="color:#aaa;">${p.desc}</p>
                     <div class="price">${p.price}</div>
                 </div>
             ).join('');
