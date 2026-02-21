@@ -2,24 +2,103 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>WorldWatch</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorldWatch Shop</title>
     <style>
-        body { background: #000; color: #0f0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: monospace; }
-        #clock { font-size: 80px; text-shadow: 0 0 20px #0f0; }
-        h1 { letter-spacing: 10px; border-bottom: 2px solid #0f0; padding-bottom: 10px; }
+        :root { --main-color: #00ffcc; --bg-color: #0a0a0a; }
+        body { background: var(--bg-color); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        
+        /* Приветственный экран */
+        #intro {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: black; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 1000;
+            transition: 0.8s;
+        }
+        .welcome-text { font-size: 3rem; margin-bottom: 20px; animation: fadeIn 2s; color: var(--main-color); }
+        .skip-btn { padding: 10px 25px; border: 2px solid var(--main-color); background: transparent; color: white; cursor: pointer; border-radius: 50px; }
+
+        /* Основной контент */
+        #main-content { display: none; padding: 20px; text-align: center; }
+        .header { font-size: 2.5rem; color: var(--main-color); margin-bottom: 30px; }
+        
+        /* Продукты */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px; }
+        .product-card { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; transition: 0.3s; }
+        .product-card:hover { border-color: var(--main-color); transform: translateY(-5px); }
+        .price { font-size: 1.5rem; color: var(--main-color); font-weight: bold; }
+
+        /* Языки и Контакты */
+        .lang-switcher { margin-bottom: 20px; }
+        .lang-btn { background: #333; color: white; border: none; padding: 5px 10px; margin: 0 5px; cursor: pointer; border-radius: 5px; }
+        .whatsapp-btn { position: fixed; bottom: 20px; right: 20px; background: #25d366; color: white; padding: 15px 25px; border-radius: 50px; text-decoration: none; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-    <h1>WORLDWATCH</h1>
-    <div id="clock">00:00:00</div>
+
+    <div id="intro">
+        <div class="welcome-text" id="hello-text">Добрый день</div>
+        <button class="skip-btn" onclick="showMain()" id="skip-txt">Пропустить</button>
+    </div>
+
+    <div id="main-content">
+        <div class="lang-switcher">
+            <button class="lang-btn" onclick="changeLang('ru')">RU</button>
+            <button class="lang-btn" onclick="changeLang('it')">IT</button>
+            <button class="lang-btn" onclick="changeLang('en')">EN</button>
+            <button class="lang-btn" onclick="changeLang('pl')">PL</button>
+        </div>
+
+        <h1 class="header">WorldWatch</h1>
+        <h2 id="prod-title">Наши Продукты</h2>
+
+        <div class="products-grid" id="products">
+            </div>
+
+        <a href="https://wa.me/48796128572" class="whatsapp-btn">WhatsApp Контакт</a>
+    </div>
 
     <script>
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString();
+        // ДАННЫЕ ПРОДУКТОВ (Редактируй здесь!)
+        const myProducts = [
+            { name: "Часы Модель X", price: "150$", img: "⌚" },
+            { name: "Смарт Браслет", price: "80$", img: "📱" },
+            { name: "Премиум Ремешок", price: "30$", img: "⚙️" }
+        ];
+
+        // Переводы
+        const translations = {
+            ru: { hello: "Добрый день", skip: "Пропустить", title: "Продукты" },
+            it: { hello: "Buon giorno", skip: "Saltare", title: "Prodotti" },
+            en: { hello: "Good day", skip: "Skip", title: "Products" },
+            pl: { hello: "Dzień dobry", skip: "Pominąć", title: "Produkty" }
+        };
+
+        function showMain() {
+            document.getElementById('intro').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('intro').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                renderProducts();
+            }, 800);
+        }function renderProducts() {
+            const container = document.getElementById('products');
+            container.innerHTML = myProducts.map(p => 
+                <div class="product-card">
+                    <div style="font-size: 50px">${p.img}</div>
+                    <h3>${p.name}</h3>
+                    <p class="price">${p.price}</p>
+                </div>
+            ).join('');
         }
-        setInterval(updateTime, 1000);
-        updateTime();
+
+        function changeLang(lang) {
+            document.getElementById('hello-text').innerText = translations[lang].hello;
+            document.getElementById('skip-txt').innerText = translations[lang].skip;
+            document.getElementById('prod-title').innerText = translations[lang].title;
+        }
     </script>
 </body>
-</html>  
+</html>
