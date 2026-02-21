@@ -6,34 +6,33 @@
     <title>WorldWatch Shop</title>
     <style>
         :root { --main-color: #00ffcc; --bg-color: #0a0a0a; }
-        body { background: var(--bg-color); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        body { background: var(--bg-color); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
         
         /* Приветственный экран */
         #intro {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
             background: black; display: flex; flex-direction: column;
             align-items: center; justify-content: center; z-index: 1000;
-            transition: 0.8s;
         }
-        .welcome-text { font-size: 3rem; margin-bottom: 20px; animation: fadeIn 2s; color: var(--main-color); }
-        .skip-btn { padding: 10px 25px; border: 2px solid var(--main-color); background: transparent; color: white; cursor: pointer; border-radius: 50px; }
+        .welcome-text { font-size: 3rem; margin-bottom: 20px; color: var(--main-color); text-align: center; }
+        .skip-btn { padding: 15px 40px; border: 2px solid var(--main-color); background: var(--main-color); color: black; cursor: pointer; border-radius: 50px; font-weight: bold; font-size: 1.2rem; transition: 0.3s; }
+        .skip-btn:hover { background: transparent; color: white; }
 
         /* Основной контент */
-        #main-content { display: none; padding: 20px; text-align: center; }
-        .header { font-size: 2.5rem; color: var(--main-color); margin-bottom: 30px; }
+        #main-content { display: none; height: 100vh; overflow-y: auto; padding: 40px 20px; text-align: center; }
+        .header { font-size: 3rem; color: var(--main-color); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 5px; }
         
-        /* Продукты */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px; }
-        .product-card { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; transition: 0.3s; }
-        .product-card:hover { border-color: var(--main-color); transform: translateY(-5px); }
-        .price { font-size: 1.5rem; color: var(--main-color); font-weight: bold; }
+        /* Сетка продуктов */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 40px auto; }
+        .product-card { background: #151515; padding: 30px; border-radius: 20px; border: 1px solid #333; transition: 0.3s; }
+        .product-card:hover { border-color: var(--main-color); transform: scale(1.03); }
+        .price { font-size: 1.8rem; color: var(--main-color); margin: 15px 0; }
 
-        /* Языки и Контакты */
-        .lang-switcher { margin-bottom: 20px; }
-        .lang-btn { background: #333; color: white; border: none; padding: 5px 10px; margin: 0 5px; cursor: pointer; border-radius: 5px; }
-        .whatsapp-btn { position: fixed; bottom: 20px; right: 20px; background: #25d366; color: white; padding: 15px 25px; border-radius: 50px; text-decoration: none; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        /* Контакты и Языки */
+        .lang-switcher { position: absolute; top: 20px; left: 20px; }
+        .lang-btn { background: #222; color: white; border: 1px solid #444; padding: 8px 12px; cursor: pointer; border-radius: 5px; margin-right: 5px; }
+        .whatsapp-btn { display: inline-block; background: #25d366; color: white; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; margin-top: 30px; transition: 0.3s; }
+        .whatsapp-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4); }
     </style>
 </head>
 <body>
@@ -54,42 +53,41 @@
         <h1 class="header">WorldWatch</h1>
         <h2 id="prod-title">Наши Продукты</h2>
 
-        <div class="products-grid" id="products">
+        <div class="products-grid" id="products-list">
             </div>
 
-        <a href="https://wa.me/48796128572" class="whatsapp-btn">WhatsApp Контакт</a>
+        <a href="https://wa.me/48796128572" class="whatsapp-btn">WhatsApp: +48 796 128 572</a>
+        <p style="margin-top: 50px; color: #555;">© 2026 WorldWatch Shop</p>
     </div>
 
     <script>
-        // ДАННЫЕ ПРОДУКТОВ (Редактируй здесь!)
+        // ТВОИ ТОВАРЫ (Редактируй названия и цены тут!)
         const myProducts = [
-            { name: "Часы Модель X", price: "150$", img: "⌚" },
-            { name: "Смарт Браслет", price: "80$", img: "📱" },
-            { name: "Премиум Ремешок", price: "30$", img: "⚙️" }
+            { name: "Classic Watch", price: "450 PLN", icon: "⌚" },
+            { name: "Sport Band", price: "120 PLN", icon: "🏃" },
+            { name: "Luxury Gold", price: "990 PLN", icon: "👑" },
+            { name: "Smart Pro", price: "600 PLN", icon: "📱" }
         ];
 
-        // Переводы
         const translations = {
-            ru: { hello: "Добрый день", skip: "Пропустить", title: "Продукты" },
-            it: { hello: "Buon giorno", skip: "Saltare", title: "Prodotti" },
-            en: { hello: "Good day", skip: "Skip", title: "Products" },
-            pl: { hello: "Dzień dobry", skip: "Pominąć", title: "Produkty" }
-        };
+            ru: { hello: "Добрый день", skip: "Пропустить", title: "Наши Продукты" },
+            it: { hello: "Buon giorno", skip: "Saltare", title: "I nostri prodotti" },
+            en: { hello: "Good day", skip: "Skip", title: "Our Products" },
+            pl: { hello: "Dzień dobry", skip: "Pominąć", title: "Nasze Produkty" }
+        };function showMain() {
+            document.body.style.overflow = 'auto';
+            document.getElementById('intro').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            renderProducts();
+        }
 
-        function showMain() {
-            document.getElementById('intro').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('intro').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-                renderProducts();
-            }, 800);
-        }function renderProducts() {
-            const container = document.getElementById('products');
-            container.innerHTML = myProducts.map(p => 
+        function renderProducts() {
+            const list = document.getElementById('products-list');
+            list.innerHTML = myProducts.map(p => 
                 <div class="product-card">
-                    <div style="font-size: 50px">${p.img}</div>
+                    <div style="font-size: 60px; margin-bottom: 10px;">${p.icon}</div>
                     <h3>${p.name}</h3>
-                    <p class="price">${p.price}</p>
+                    <div class="price">${p.price}</div>
                 </div>
             ).join('');
         }
