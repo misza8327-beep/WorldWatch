@@ -3,33 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorldWatch Admin Panel</title>
+    <title>WorldWatch Professional</title>
     <style>
         :root { --main-color: #00ffcc; --bg-color: #0a0a0a; }
         body { background: var(--bg-color); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
         
         #main-content { padding: 40px 20px; text-align: center; }
-        .header { font-size: 3.5rem; color: var(--main-color); text-transform: uppercase; letter-spacing: 8px; }
+        .header { font-size: 3.5rem; color: var(--main-color); text-transform: uppercase; letter-spacing: 8px; margin-bottom: 10px; }
         
-        /* Сетка продуктов */
         .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 40px auto; }
-        .product-card { background: #151515; padding: 30px; border-radius: 20px; border: 1px solid #333; position: relative; }
-        .product-card h3 { color: var(--main-color); margin: 10px 0; }
+        .product-card { background: #151515; padding: 30px; border-radius: 20px; border: 1px solid #333; position: relative; text-align: left; transition: 0.3s; }
+        .product-card:hover { border-color: var(--main-color); }
         .price { font-size: 1.8rem; color: white; font-weight: bold; border-top: 1px solid #333; padding-top: 15px; display: block; }
-        
-        /* Панель админа (скрыта) */
+
+        /* Админ-панель (изначально полностью вырезана из видимости) */
+        #admin-auth-link { display: none; color: #111; cursor: pointer; font-size: 10px; margin-top: 100px; }
         #admin-panel { 
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #222; padding: 30px; border: 2px solid var(--main-color); z-index: 10000;
-            border-radius: 20px; width: 300px; box-shadow: 0 0 50px rgba(0,0,0,0.9);
+            background: #1a1a1a; padding: 30px; border: 2px solid var(--main-color); z-index: 10001;
+            border-radius: 20px; width: 350px; box-shadow: 0 0 100px rgba(0,0,0,1);
         }
         #admin-panel input, #admin-panel textarea { 
-            width: 100%; margin-bottom: 10px; background: #333; border: 1px solid #444; color: white; padding: 10px; box-sizing: border-box;
+            width: 100%; margin-bottom: 15px; background: #222; border: 1px solid #444; color: white; padding: 12px; box-sizing: border-box; border-radius: 8px;
         }
-        .admin-btn { background: var(--main-color); color: black; border: none; padding: 10px; cursor: pointer; font-weight: bold; width: 100%; }
-        .delete-btn { position: absolute; top: 10px; right: 10px; background: red; color: white; border: none; cursor: pointer; display: none; }
+        .admin-btn { background: var(--main-color); color: black; border: none; padding: 12px; cursor: pointer; font-weight: bold; width: 100%; border-radius: 8px; }
+        .delete-btn { position: absolute; top: 15px; right: 15px; background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; display: none; }
 
-        .whatsapp-btn { display: inline-block; background: #25d366; color: white; padding: 18px 35px; border-radius: 50px; text-decoration: none; font-weight: bold; }
+        .whatsapp-btn { display: inline-block; background: #25d366; color: white; padding: 18px 35px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -38,90 +38,99 @@
         <h1 class="header">WorldWatch</h1>
         <div class="products-grid" id="products-list"></div>
         <a href="https://wa.me/48796128572" class="whatsapp-btn">Связаться в WhatsApp</a>
-        <p style="margin-top: 20px; color: #333; font-size: 0.8rem;">Press Ctrl + L to login</p>
+        
+        <div id="admin-auth-link" onclick="openAdmin()">[ . ]</div>
     </div>
 
     <div id="admin-panel">
-        <h3>Добавить товар</h3>
-        <input type="text" id="p-name" placeholder="Название">
-        <input type="text" id="p-price" placeholder="Цена (н-р: 500 PLN)">
+        <h3 style="color:var(--main-color)">Панель управления</h3>
+        <input type="text" id="p-name" placeholder="Название товара">
+        <input type="text" id="p-price" placeholder="Цена (например: 100 PLN)">
         <textarea id="p-desc" placeholder="Описание"></textarea>
-        <input type="text" id="p-icon" placeholder="Эмодзи (н-р: ⌚)">
-        <button class="admin-btn" onclick="addProduct()">Добавить на сайт</button>
-        <button class="admin-btn" style="background: #555; margin-top: 5px;" onclick="closeAdmin()">Закрыть</button>
+        <input type="text" id="p-icon" placeholder="Эмодзи (⌚, 👑, 🎁)">
+        <button class="admin-btn" onclick="addNewProduct()">Добавить товар</button>
+        <button class="admin-btn" style="background:#444; color:white; margin-top:10px;" onclick="document.getElementById('admin-panel').style.display='none'">Закрыть</button>
     </div>
 
     <script>
-        // Начальные товары (если памяти нет)
-        let defaultProducts = [
-            { name: "Golden Luxury", price: "899 PLN", desc: "Эксклюзивные часы.", icon: "👑" }
+        // ТВОЙ ПАРОЛЬ: 1396
+        const ADMIN_PASS = "1396";
+        
+        let products = JSON.parse(localStorage.getItem('worldwatch_items')) || [
+            { name: "Classic Gold", price: "899 PLN", desc: "Премиальные часы.", icon: "👑" }
         ];
 
-        // Загрузка товаров из памяти твоего компьютера
-        let products = JSON.parse(localStorage.getItem('mySiteProducts')) || defaultProducts;
+        // 1. ПРОВЕРКА IP
+        async function checkAccess() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                const userIP = data.ip;// Сохраняем первый зашедший IP как админский (это будешь ты)
+                if (!localStorage.getItem('admin_ip')) {
+                    localStorage.setItem('admin_ip', userIP);
+                }
+
+                // Если IP совпадает с сохраненным админским
+                if (userIP === localStorage.getItem('admin_ip')) {
+                    document.getElementById('admin-auth-link').style.display = 'block';
+                }
+            } catch (e) {
+                console.log("Ошибка проверки IP");
+            }
+        }
 
         function render() {
             const list = document.getElementById('products-list');
-            list.innerHTML = products.map((p, index) => `
+            list.innerHTML = products.map((p, i) => 
                 <div class="product-card">
-                    <button class="delete-btn" onclick="deleteProduct(${index})">❌</button>
-                    <div style="font-size: 50px;">${p.icon}</div>
+                    <button class="delete-btn" id="del-${i}" onclick="removeProduct(${i})">Удалить</button>
+                    <div style="font-size: 50px; margin-bottom: 10px;">${p.icon}</div>
                     <h3>${p.name}</h3>
-                    <p style="color:#aaa;">${p.desc}</p><span class="price">${p.price}</span>
+                    <p style="color:#888;">${p.desc}</p>
+                    <span class="price">${p.price}</span>
                 </div>
-            `).join('');
-            
-            // Если мы в режиме админа, показываем кнопки удаления
-            if (isAdmin) {
-                document.querySelectorAll('.delete-btn').forEach(btn => btn.style.display = 'block');
+            ).join('');
+        }
+
+        function openAdmin() {
+            let p = prompt("Введите пароль (1396):");
+            if (p === ADMIN_PASS) {
+                document.getElementById('admin-panel').style.display = 'block';
+                document.querySelectorAll('.delete-btn').forEach(b => b.style.display = 'block');
+            } else {
+                alert("Доступ запрещен!");
             }
         }
 
-        let isAdmin = false;
-
-        // Секретный вход: нажми Ctrl + L
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'l') {
-                let pass = prompt("Введите пароль администратора:");
-                if (pass === "1234") { // МОЖЕШЬ ПОМЕНЯТЬ ПАРОЛЬ ТУТ
-                    isAdmin = true;
-                    document.getElementById('admin-panel').style.display = 'block';
-                    render();
-                } else {
-                    alert("Доступ запрещен!");
-                }
-            }
-        });
-
-        function addProduct() {
+        function addNewProduct() {
             const name = document.getElementById('p-name').value;
             const price = document.getElementById('p-price').value;
             const desc = document.getElementById('p-desc').value;
-            const icon = document.getElementById('p-icon').value;
+            const icon = document.getElementById('p-icon').value || "⌚";
 
             if (name && price) {
                 products.push({ name, price, desc, icon });
-                saveAndRefresh();
+                save();
             }
         }
 
-        function deleteProduct(index) {
-            products.splice(index, 1);
-            saveAndRefresh();
+        function removeProduct(i) {
+            if(confirm("Удалить этот товар?")) {
+                products.splice(i, 1);
+                save();
+            }
         }
 
-        function saveAndRefresh() {
-            localStorage.setItem('mySiteProducts', JSON.stringify(products));
+        function save() {
+            localStorage.setItem('worldwatch_items', JSON.stringify(products));
             render();
-            // Очистка полей
-            document.querySelectorAll('#admin-panel input, #admin-panel textarea').forEach(i => i.value = '');
+            // Скрыть кнопки удаления после сохранения, если нужно
         }
 
-        function closeAdmin() {
-            document.getElementById('admin-panel').style.display = 'none';
-        }
-
-        window.onload = render;
+        window.onload = () => {
+            checkAccess();
+            render();
+        };
     </script>
 </body>
 </html>
